@@ -1,0 +1,27 @@
+﻿<Application x:Class="MinecraftLWPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:MinecraftLWPF"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:helpers="clr-namespace:MinecraftLWPF.Helpers"
+             xmlns:models="clr-namespace:MinecraftLWPF.Minecraft"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <helpers:BooleanToVisibilityConverter
+                x:Key="BoolToVisInverted"
+                True="Collapsed"
+                False="Visible" />
+            <helpers:BooleanToVisibilityConverter
+                x:Key="BoolToVis"
+                True="Visible"
+                False="Collapsed" />
+            <models:McSettings x:Key="McSettingsModel" />
+            <models:Minecraft x:Key="MinecraftModel" />
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

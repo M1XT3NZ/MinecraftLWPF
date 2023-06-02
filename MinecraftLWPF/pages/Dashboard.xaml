@@ -1,0 +1,38 @@
+﻿<Page x:Class="MinecraftLWPF.pages.Dashboard"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:MinecraftLWPF.pages"
+      xmlns:minecraft="clr-namespace:MinecraftLWPF.Minecraft"
+      mc:Ignorable="d"
+      Title="Dashboard" Height="450" Width="800">
+    <Page.DataContext>
+        <Binding Source="{StaticResource MinecraftModel}"></Binding>
+    </Page.DataContext>
+    <StackPanel>
+        <ComboBox ItemsSource="{Binding Versions}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedIndex="1">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Name}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+            <ComboBox.Style>
+                <Style>
+                    <Setter Property="ComboBox.ItemsSource" Value="{Binding Versions}"></Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding XPath=Release}" Value="true">
+                            <Setter Property="ComboBox.ItemsSource" Value="{Binding Path=Versions}"></Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ComboBox.Style>
+        </ComboBox>
+        <CheckBox Name="Release" Click="Checkboxes_OnClick"  Content="Release" ></CheckBox>
+        <CheckBox Name="Snapshot" Click="Checkboxes_OnClick" Content="Beta" ></CheckBox>
+        <CheckBox Name="OldBeta" Click="Checkboxes_OnClick" Content="OldBeta" ></CheckBox>
+        <CheckBox Name="OldAlpha" Click="Checkboxes_OnClick" Content="OldAlpha" ></CheckBox>
+    </StackPanel>
+</Page>

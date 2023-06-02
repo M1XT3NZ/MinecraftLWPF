@@ -1,0 +1,34 @@
+﻿<ui:UiPage x:Class="MinecraftLWPF.pages.Settings"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:MinecraftLWPF.pages"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      
+      mc:Ignorable="d"
+      Title="Settings"
+      >
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" Grid.Column="0" Header="Java">
+        </GroupBox>
+        <GroupBox Grid.Row="0" Grid.Column="1" Header="test1">
+            
+        </GroupBox>
+        <GroupBox Grid.Row="1" Grid.Column="0" Header="test2">
+            
+        </GroupBox>
+        <GroupBox Grid.Column="1" Grid.Row="1" Header="test3">
+            
+        </GroupBox>
+     
+    </Grid>
+</ui:UiPage>
