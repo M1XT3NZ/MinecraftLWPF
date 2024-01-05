@@ -1,34 +1,72 @@
-﻿<ui:UiPage x:Class="MinecraftLWPF.pages.Settings"
+﻿<Page x:Class="MinecraftLWPF.pages.Settings"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:MinecraftLWPF.pages"
-      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-      
+      xmlns:local="clr-namespace:MinecraftLWPF.Helpers"
       mc:Ignorable="d"
-      Title="Settings"
-      >
+      Title="Settings">
+    <Page.Resources>
+        <!-- Ensure your converters are correctly referenced here -->
+        <local:SliderTickLabelPositionMultiConverter x:Key="SliderTickLabelPositionMultiConverter"/>
+        <local:MemoryValueToDisplayConverter x:Key="MemoryValueToDisplayConverter"/>
+    </Page.Resources>
+    <Page.DataContext>
+        <!-- Make sure your DataContext is set up properly -->
+        <Binding Source="{StaticResource McSettingsModel}" />
+    </Page.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Grid.Column="0" Header="Java">
+
+        <!-- Java Settings Group -->
+        <GroupBox Grid.Row="0" Grid.Column="0" Header="Java Settings" Margin="10">
+            <StackPanel>
+                <TextBlock Text="Memory:" Margin="5"/>
+                <Slider x:Name="MemorySlider"
+                        Minimum="1024"
+                        Maximum="{Binding MaxMemory}"
+                        TickFrequency="1024"
+                        Value="{Binding JavaMemory}"
+                        AutoToolTipPlacement="TopLeft"
+                        IsSnapToTickEnabled="True"
+                        TickPlacement="BottomRight"/>
+                <Canvas x:Name="MemoryMilestoneCanvas" Height="20" Margin="5,0"/>
+
+                <TextBlock Text="Custom Arguments:" Margin="5"/>
+                <TextBox Text="{Binding JavaCustomArguments}" Margin="5" />
+            </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Row="0" Grid.Column="1" Header="test1">
-            
+
+        <!-- Application Settings Group -->
+        <GroupBox Grid.Row="0" Grid.Column="1" Header="Application Settings" Margin="10">
+            <StackPanel>
+                <!-- <TextBlock Text="Language:" Margin="5"/> -->
+                <!-- <ComboBox SelectedItem="{Binding Language}" Margin="5"> -->
+                <!--     ~1~ Language selection logic @1@ -->
+                <!-- </ComboBox> -->
+
+                <TextBlock Text="Enable Logging:" Margin="5"/>
+                <CheckBox IsChecked="{Binding EnableLogging}" Margin="5"/>
+            </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Row="1" Grid.Column="0" Header="test2">
-            
-        </GroupBox>
-        <GroupBox Grid.Column="1" Grid.Row="1" Header="test3">
-            
-        </GroupBox>
-     
+
+        <!-- Additional Setting Groups -->
+        <!-- Populate as needed with other settings -->
+
+        <!-- Save Button -->
+        <Button Content="Save Settings"
+                Grid.Row="3" Grid.ColumnSpan="2"
+                Click="SaveButton_Click"
+                Margin="10" HorizontalAlignment="Right" 
+                Width="120" Height="30" />
     </Grid>
-</ui:UiPage>
+</Page>
