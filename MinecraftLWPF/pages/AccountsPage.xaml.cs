@@ -24,7 +24,7 @@ public partial class AccountsPage : Page
         {
             await accountsManager.Login();
             // After successful login, fetch and display character head
-            await accountsManager.RefreshHead();
+           // await accountsManager.RefreshHead();
         }
         catch (Exception ex)
         {
@@ -37,7 +37,7 @@ public partial class AccountsPage : Page
         {
             await accountsManager.Logout();
             // After successful login, fetch and display character head
-            await accountsManager.RefreshHead();
+            //await accountsManager.RefreshHead();
         }
         catch (Exception ex)
         {
