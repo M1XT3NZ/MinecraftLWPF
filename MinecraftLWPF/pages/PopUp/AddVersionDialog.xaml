@@ -40,12 +40,12 @@
 
                 <!-- Content for Vanilla Minecraft versions -->
             </TabItem>
-            <TabItem Header="CurseForge">
-                <!-- Content for CurseForge versions -->
-            </TabItem>
-            <TabItem Header="FTB">
-                <!-- Content for FTB versions -->
-            </TabItem>
+            <!-- <TabItem Header="CurseForge"> -->
+            <!--     ~1~ Content for CurseForge versions @1@ -->
+            <!-- </TabItem> -->
+            <!-- <TabItem Header="FTB"> -->
+            <!--     ~1~ Content for FTB versions @1@ -->
+            <!-- </TabItem> -->
         </TabControl>
     </StackPanel>
 

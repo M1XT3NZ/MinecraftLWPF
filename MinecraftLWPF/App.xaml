@@ -17,6 +17,7 @@
                 False="Collapsed" />
             <models:MinecraftSettings x:Key="McSettingsModel" />
             <models:L_Minecraft x:Key="MinecraftModel" />
+            <models:AccountsManager x:Key="AccountsManager" />
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Dark" />
                 <ui:ControlsDictionary />

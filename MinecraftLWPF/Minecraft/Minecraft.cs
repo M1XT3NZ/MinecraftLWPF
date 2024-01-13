@@ -48,11 +48,9 @@ public class L_Minecraft : INotifyPropertyChanged
 
         #endregion
     }
-
     public bool IsFlyoutOpen { get; set; }
     public static L_Minecraft Instance => lazyInstance.Value;
-
-
+    
     public ObservableCollection<MVersion> Versions { get; }
     public ObservableCollection<MVersion> LocalVersions { get; private set; }
     public ObservableCollection<MVersion> FilteredVersions { get; }

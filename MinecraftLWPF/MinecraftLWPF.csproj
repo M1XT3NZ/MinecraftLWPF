@@ -15,4 +15,10 @@
         <PackageReference Include="WPF-UI" Version="3.0.0-preview.13"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="leMaik.McHeads">
+        <HintPath>..\McHeads\Skinned Cube\bin\Debug\leMaik.McHeads.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

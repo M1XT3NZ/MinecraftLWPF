@@ -14,7 +14,7 @@ public partial class AccountsPage : Page
     public AccountsPage()
     {
         InitializeComponent();
-        accountsManager = new AccountsManager();
+        accountsManager = AccountsManager.Instance;
         // Additional initialization if needed
     }
 
@@ -24,17 +24,24 @@ public partial class AccountsPage : Page
         {
             await accountsManager.Login();
             // After successful login, fetch and display character head
-            UpdateCharacterHead();
+            await accountsManager.RefreshHead();
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Error: {ex.Message}");
         }
     }
-
-    private void UpdateCharacterHead()
+    private async void Logout_Click(object sender, RoutedEventArgs e)
     {
-        // Implement logic to fetch character's head based on the account
-        // Update CharacterHeadImage.Source with the fetched image
+        try
+        {
+            await accountsManager.Logout();
+            // After successful login, fetch and display character head
+            await accountsManager.RefreshHead();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error: {ex.Message}");
+        }
     }
 }
