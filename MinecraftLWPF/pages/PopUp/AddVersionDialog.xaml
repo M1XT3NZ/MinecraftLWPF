@@ -1,0 +1,52 @@
+﻿<ui:Flyout x:Class="MinecraftLWPF.pages.PopUp.AddVersionDialog"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+           Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+           mc:Ignorable="d"
+           Height="300" Width="550"
+           Loaded="Dashboard_OnLoaded">
+    <ui:Flyout.DataContext>
+        <Binding Source="{StaticResource MinecraftModel}" />
+    </ui:Flyout.DataContext>
+    <StackPanel>
+        <TabControl TabStripPlacement="Top">
+            <TabItem Header="Vanilla">
+                <StackPanel>
+                    <ComboBox Name="Test" ItemsSource="{Binding FilteredVersions }">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" Foreground="White" FontSize="16" FontWeight="Bold" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Content="Release" IsChecked="{Binding Filter.Release}" Click="Checkboxes_OnClick"
+                                  Margin="5" />
+                        <CheckBox Content="Snapshot" IsChecked="{Binding Filter.Snapshot}" Click="Checkboxes_OnClick"
+                                  Margin="5" />
+                        <CheckBox Content="Beta" IsChecked="{Binding Filter.Beta}" Click="Checkboxes_OnClick"
+                                  Margin="5" />
+                        <CheckBox Content="Alpha" IsChecked="{Binding Filter.Alpha}" Click="Checkboxes_OnClick"
+                                  Margin="5" />
+                    </StackPanel>
+                    <Button Click="SexButton">Download</Button>
+
+                </StackPanel>
+
+                <!-- Content for Vanilla Minecraft versions -->
+            </TabItem>
+            <TabItem Header="CurseForge">
+                <!-- Content for CurseForge versions -->
+            </TabItem>
+            <TabItem Header="FTB">
+                <!-- Content for FTB versions -->
+            </TabItem>
+        </TabControl>
+    </StackPanel>
+
+</ui:Flyout>

@@ -2,103 +2,259 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using CmlLib.Core;
+using CmlLib.Core.Auth;
+using CmlLib.Core.Downloader;
 using CmlLib.Core.Version;
+using Newtonsoft.Json;
+using Wpf.Ui.Input;
 
-namespace MinecraftLWPF.Minecraft
+namespace MinecraftLWPF.Minecraft;
+
+public class L_Minecraft : INotifyPropertyChanged
 {
-    public class L_Minecraft : INotifyPropertyChanged
+    public static readonly string MinecraftPath =
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Veltrox\\.minecraft";
+
+    private static readonly Lazy<L_Minecraft> lazyInstance = new(() => new L_Minecraft());
+
+    public CMLauncher launcher;
+
+    public L_Minecraft()
     {
-        public static readonly string MinecraftPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Veltrox\\.minecraft";
+        var path = new MinecraftPath(MinecraftPath);
+        launcher = new CMLauncher(path);
+        launcher.FileDownloader = new AsyncParallelDownloader(20);
+        Versions = new ObservableCollection<MVersion>();
+        FilteredVersions = new ObservableCollection<MVersion>();
+        LocalVersions = new ObservableCollection<MVersion>();
+        Filter = new VersionFilter();
+        GetVersions();
 
-        private static readonly Lazy<L_Minecraft> lazyInstance = new Lazy<L_Minecraft>(() => new L_Minecraft());
-        public static L_Minecraft Instance => lazyInstance.Value;
+        #region MCLauncher Events
 
-        private CMLauncher launcher;
-
-        public ObservableCollection<MVersion> Versions { get; }
-        public ObservableCollection<MVersion> FilteredVersions { get; }
-        public VersionFilter Filter { get; set; }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        public L_Minecraft()
+        launcher.FileChanged += e =>
         {
-            var path = new MinecraftPath(MinecraftPath);
-            launcher = new CMLauncher(path);
-            Versions = new ObservableCollection<MVersion>();
-            FilteredVersions = new ObservableCollection<MVersion>();
-            Filter = new VersionFilter();
-            GetVersions();
+            Console.WriteLine("FileKind: " + e.FileKind);
+            Console.WriteLine("FileName: " + e.FileName);
+        };
+        launcher.ProgressChanged += (s, e) => { Console.WriteLine("{0}%", e.ProgressPercentage); };
+
+        #endregion
+    }
+
+    public bool IsFlyoutOpen { get; set; }
+    public static L_Minecraft Instance => lazyInstance.Value;
+
+
+    public ObservableCollection<MVersion> Versions { get; }
+    public ObservableCollection<MVersion> LocalVersions { get; private set; }
+    public ObservableCollection<MVersion> FilteredVersions { get; }
+    public VersionFilter Filter { get; set; }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public void SaveLocalVersions(string filePath = null)
+    {
+        if (filePath == null)
+            filePath = MinecraftSettings.Instance.SettingsPath + "LocalVersions.json";
+
+        var json = JsonConvert.SerializeObject(LocalVersions, Formatting.Indented, new TimeSpanConverter());
+        File.WriteAllText(filePath, json);
+    }
+
+    public void LoadLocalVersions(string filePath = null)
+    {
+        if (filePath == null)
+            filePath = MinecraftSettings.Instance.SettingsPath + "LocalVersions.json";
+
+        if (!File.Exists(filePath))
+        {
+            LocalVersions = new ObservableCollection<MVersion>();
+            return;
         }
 
-        private void GetVersions()
+        var json = File.ReadAllText(filePath);
+        LocalVersions = JsonConvert.DeserializeObject<ObservableCollection<MVersion>>(json, new TimeSpanConverter());
+        foreach (var mVersion in LocalVersions) mVersion.PlayCommand = new RelayCommand<MVersion>(StartGame!);
+    }
+
+    private void GetVersions()
+    {
+        // Add error handling as needed
+        foreach (var version in launcher.GetAllVersions())
         {
-            // Add error handling as needed
-            foreach (var version in launcher.GetAllVersions())
+            var mvers = new MVersion
             {
-                var mvers = new MVersion
-                {
-                    Name = version.Name,
-                    Type = version.MType,
-                    IsLocalVersion = version.IsLocalVersion
-                };
-                Versions.Add(mvers);
-            }
+                Name = version.Name,
+                Type = version.MType,
+                IsLocalVersion = version.IsLocalVersion
+            };
+            Versions.Add(mvers);
         }
+    }
 
-        public async Task FilterVersions()
+    public async void DownloadVersion(MVersion version)
+    {
+        var process = await launcher.CreateProcessAsync(version.Name, new MLaunchOption
         {
-            FilteredVersions.Clear();
+            Session = MSession.CreateOfflineSession("username")
+        });
+        GetVersionsLocal();
+    }
 
+    public async void GetVersionsLocal()
+    {
+        if (MinecraftSettings.Instance.SettingsPath + "LocalVersions.json" != null)
+            await Application.Current.Dispatcher.InvokeAsync(() => { LoadLocalVersions(); });
+        //LocalVersions.Clear();
+        foreach (var version in await launcher.GetAllVersionsAsync())
+        {
+            if (LocalVersions.FirstOrDefault(x => x.Name == version.Name) != null) return;
             await Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                if (Filter is { Release: false, Snapshot: false, Beta: false, Alpha: false })
-                    // No checkboxes are checked, add all versions
-                    foreach (var version in Versions)
-                        FilteredVersions.Add(version);
-                else
-                    foreach (var version in Versions)
+                if (version.IsLocalVersion)
+                {
+                    var mvers = new MVersion
                     {
-                        var isFilteredVersion = (version.Type == MVersionType.Release && Filter.Release) ||
-                                                (version.Type == MVersionType.Snapshot && Filter.Snapshot) ||
-                                                (version.Type == MVersionType.OldBeta && Filter.Beta) ||
-                                                (version.Type == MVersionType.OldAlpha && Filter.Alpha);
-
-                        if (isFilteredVersion) FilteredVersions.Add(version);
-                    }
+                        Name = version.Name,
+                        Type = version.MType,
+                        IsLocalVersion = version.IsLocalVersion,
+                        PlayCommand = new RelayCommand<MVersion>(StartGame!)
+                    };
+                    LocalVersions.Add(mvers);
+                }
             });
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
-        }
+        SaveLocalVersions();
     }
 
-    public class VersionFilter
+    public async Task FilterVersions()
     {
-        public bool Release { get; set; } = true;
-        public bool Snapshot { get; set; } = false;
-        public bool Beta { get; set; } = false;
-        public bool Alpha { get; set; } = false;
+        FilteredVersions.Clear();
+
+        await Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            if (Filter is { Release: false, Snapshot: false, Beta: false, Alpha: false })
+                // No checkboxes are checked, add all versions
+                foreach (var version in Versions)
+                    FilteredVersions.Add(version);
+            else
+                foreach (var version in Versions)
+                {
+                    var isFilteredVersion = (version.Type == MVersionType.Release && Filter.Release) ||
+                                            (version.Type == MVersionType.Snapshot && Filter.Snapshot) ||
+                                            (version.Type == MVersionType.OldBeta && Filter.Beta) ||
+                                            (version.Type == MVersionType.OldAlpha && Filter.Alpha);
+
+                    if (isFilteredVersion) FilteredVersions.Add(version);
+                }
+        });
     }
 
-    public class MVersion
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
-        public string Name { get; set; }
-        public MVersionType Type { get; set; }
-        public bool IsLocalVersion { get; set; }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
+
+    #region PlayRegion
+
+    // Example method in your L_Minecraft class to start a game
+    public async void StartGame(MVersion version)
+    {
+        var process = await launcher.CreateProcessAsync(version.Name, new MLaunchOption
+        {
+            MaximumRamMb = MinecraftSettings.Instance.JavaMemory,
+            Session = MSession.CreateOfflineSession("username")
+        });
+
+        process.EnableRaisingEvents = true;
+        var startTime = DateTime.Now; // Store start time
+        process.Exited += (sender, args) =>
+        {
+            // Save playtime after the game exits
+            SavePlaytime(version, startTime, DateTime.Now);
+            SaveLocalVersions();
+        };
+        process.Start();
+    }
+
+    private void SavePlaytime(MVersion version, DateTime startTime, DateTime endTime)
+    {
+        var playTime = endTime - startTime;
+
+        var localVersion = LocalVersions.FirstOrDefault(v => v.Name == version.Name);
+        if (localVersion != null)
+        {
+            localVersion.PlayTime += playTime; // Update playtime
+            OnPropertyChanged(nameof(LocalVersions)); // Notify UI to update
+        }
+        // Logic to save playtime, for example, to a file or settings
+    }
+
+    private void PlayVersion(object parameter)
+    {
+        var version = parameter as string;
+        MessageBox.Show("Play version: " + version, "Play version");
+        // Implement the logic to launch this version
+    }
+
+    #endregion
+}
+
+public class VersionFilter
+{
+    public bool Release { get; set; } = true;
+    public bool Snapshot { get; set; } = false;
+    public bool Beta { get; set; } = false;
+    public bool Alpha { get; set; } = false;
+}
+
+public class MVersion : INotifyPropertyChanged
+{
+    private TimeSpan _playTime;
+    public string Name { get; set; }
+    public MVersionType Type { get; set; }
+    public bool IsLocalVersion { get; set; }
+
+    public TimeSpan PlayTime
+    {
+        get => _playTime;
+        set
+        {
+            if (_playTime != value)
+            {
+                _playTime = value;
+                OnPropertyChanged(nameof(PlayTime));
+            }
+        }
+    }
+
+    #region NotNeeded
+
+    [JsonIgnore] public ICommand PlayCommand { get; set; }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    #endregion
 }

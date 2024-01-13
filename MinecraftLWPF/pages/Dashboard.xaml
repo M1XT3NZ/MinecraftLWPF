@@ -3,25 +3,52 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:helpers="clr-namespace:MinecraftLWPF.Helpers"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:popUp="clr-namespace:MinecraftLWPF.pages.PopUp"
       mc:Ignorable="d"
       Title="Dashboard" Height="450" Width="800"
-       Loaded="Dashboard_OnLoaded">
+
+      Loaded="Dashboard_OnLoaded">
+    <Page.Resources>
+        <helpers:TimeSpanToFormattedStringConverter x:Key="TimeSpanConverter" />
+    </Page.Resources>
     <Page.DataContext>
         <Binding Source="{StaticResource MinecraftModel}" />
     </Page.DataContext>
-    <StackPanel Orientation="Horizontal">
-        <ListBox ItemsSource="{Binding FilteredVersions}" BorderBrush="Black">
-            <ListBox.ItemTemplate>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ItemsControl Grid.Row="0" ItemsSource="{Binding LocalVersions}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
+                    <Border Margin="5" Padding="10" Background="#333" CornerRadius="5">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" Foreground="White" FontSize="16" FontWeight="Bold" />
+                            <!-- Bind PlayTime when you have that property available -->
+                            <TextBlock Text="{Binding PlayTime, Converter={StaticResource TimeSpanConverter}}"
+                                       Foreground="White" FontSize="12" />
+                            <Button Content="Play" Command="{Binding PlayCommand}" CommandParameter="{Binding }" />
+                        </StackPanel>
+                    </Border>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <CheckBox Content="Release" Click="Checkboxes_OnClick" IsChecked="{Binding Filter.Release}" />
-        <CheckBox Content="Snapshot" Click="Checkboxes_OnClick" IsChecked="{Binding Filter.Snapshot}" />
-        <CheckBox Content="Beta" Click="Checkboxes_OnClick" IsChecked="{Binding Filter.Beta}" />
-        <CheckBox Content="Alpha" Click="Checkboxes_OnClick" IsChecked="{Binding Filter.Alpha}" />
-    </StackPanel>
-    
-    
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+
+        <ui:Flyout IsOpen="{Binding IsFlyoutOpen}" Placement="Top" Closed="TheFly_OnClosed" Name="TheFly">
+            <popUp:AddVersionDialog />
+        </ui:Flyout>
+
+        <Button Content="Add Version..." Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Margin="10" Click="AddVersion_Click" />
+    </Grid>
+
 </Page>
