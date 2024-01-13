@@ -1,7 +1,5 @@
 ﻿using System.Net;
 using System.Windows;
-using System.Windows.Forms;
-using MinecraftLWPF.Minecraft;
 using MinecraftLWPF.pages;
 using Wpf.Ui;
 using Wpf.Ui.Appearance;
@@ -22,9 +20,9 @@ public partial class MainWindow : FluentWindow
         _themeService = new ThemeService();
 
         ServicePointManager.DefaultConnectionLimit = 256;
-        
+
         DataContext = this;
-        Wpf.Ui.Appearance.SystemThemeWatcher.Watch(this);
+        SystemThemeWatcher.Watch(this);
 
         InitializeComponent();
 
@@ -33,6 +31,8 @@ public partial class MainWindow : FluentWindow
 
     private void NavigationButtonTheme_OnClick(object sender, RoutedEventArgs e)
     {
-        _themeService.SetTheme(_themeService.GetTheme() == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark);
+        _themeService.SetTheme(_themeService.GetTheme() == ApplicationTheme.Dark
+            ? ApplicationTheme.Light
+            : ApplicationTheme.Dark);
     }
 }

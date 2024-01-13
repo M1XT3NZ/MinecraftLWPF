@@ -1,0 +1,10 @@
+﻿<Page x:Class="MinecraftLWPF.pages.AccountsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="AccountsPage" Height="450" Width="800">
+    <Grid>
+        <Button x:Name="SwitchAccountButton" Content="Log In Account" HorizontalAlignment="Left"
+                VerticalAlignment="Top" Click="Login_Click" />
+        <Image x:Name="CharacterHeadImage" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="100" />
+    </Grid>
+</Page>

@@ -8,8 +8,6 @@
       Title="Settings">
     <Page.Resources>
         <!-- Ensure your converters are correctly referenced here -->
-        <local:SliderTickLabelPositionMultiConverter x:Key="SliderTickLabelPositionMultiConverter"/>
-        <local:MemoryValueToDisplayConverter x:Key="MemoryValueToDisplayConverter"/>
     </Page.Resources>
     <Page.DataContext>
         <!-- Make sure your DataContext is set up properly -->
@@ -30,7 +28,7 @@
         <!-- Java Settings Group -->
         <GroupBox Grid.Row="0" Grid.Column="0" Header="Java Settings" Margin="10">
             <StackPanel>
-                <TextBlock Text="Memory:" Margin="5"/>
+                <TextBlock Text="Memory:" Margin="5" />
                 <Slider x:Name="MemorySlider"
                         Minimum="1024"
                         Maximum="{Binding MaxMemory}"
@@ -38,10 +36,10 @@
                         Value="{Binding JavaMemory}"
                         AutoToolTipPlacement="TopLeft"
                         IsSnapToTickEnabled="True"
-                        TickPlacement="BottomRight"/>
-                <Canvas x:Name="MemoryMilestoneCanvas" Height="20" Margin="5,0"/>
+                        TickPlacement="BottomRight" />
+                <Canvas x:Name="MemoryMilestoneCanvas" Height="20" Margin="5,0" />
 
-                <TextBlock Text="Custom Arguments:" Margin="5"/>
+                <TextBlock Text="Custom Arguments:" Margin="5" />
                 <TextBox Text="{Binding JavaCustomArguments}" Margin="5" />
             </StackPanel>
         </GroupBox>
@@ -54,8 +52,8 @@
                 <!--     ~1~ Language selection logic @1@ -->
                 <!-- </ComboBox> -->
 
-                <TextBlock Text="Enable Logging:" Margin="5"/>
-                <CheckBox IsChecked="{Binding EnableLogging}" Margin="5"/>
+                <TextBlock Text="Enable Logging:" Margin="5" />
+                <CheckBox IsChecked="{Binding EnableLogging}" Margin="5" />
             </StackPanel>
         </GroupBox>
 
@@ -66,7 +64,7 @@
         <Button Content="Save Settings"
                 Grid.Row="3" Grid.ColumnSpan="2"
                 Click="SaveButton_Click"
-                Margin="10" HorizontalAlignment="Right" 
+                Margin="10" HorizontalAlignment="Right"
                 Width="120" Height="30" />
     </Grid>
 </Page>
