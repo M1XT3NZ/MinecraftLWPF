@@ -17,20 +17,20 @@ using Wpf.Ui.Input;
 
 namespace MinecraftLWPF.Minecraft;
 
-public class L_Minecraft : INotifyPropertyChanged
+public class LMinecraft : INotifyPropertyChanged
 {
     public static readonly string MinecraftPath =
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Veltrox\\.minecraft";
 
-    private static readonly Lazy<L_Minecraft> lazyInstance = new(() => new L_Minecraft());
+    private static readonly Lazy<LMinecraft> LazyInstance = new(() => new LMinecraft());
 
-    public CMLauncher launcher;
+    public CMLauncher Launcher;
 
-    public L_Minecraft()
+    public LMinecraft()
     {
         var path = new MinecraftPath(MinecraftPath);
-        launcher = new CMLauncher(path);
-        launcher.FileDownloader = new AsyncParallelDownloader(20);
+        Launcher = new CMLauncher(path);
+        Launcher.FileDownloader = new AsyncParallelDownloader(20);
         Versions = new ObservableCollection<MVersion>();
         FilteredVersions = new ObservableCollection<MVersion>();
         LocalVersions = new ObservableCollection<MVersion>();
@@ -39,17 +39,17 @@ public class L_Minecraft : INotifyPropertyChanged
 
         #region MCLauncher Events
 
-        launcher.FileChanged += e =>
+        Launcher.FileChanged += e =>
         {
             Console.WriteLine("FileKind: " + e.FileKind);
             Console.WriteLine("FileName: " + e.FileName);
         };
-        launcher.ProgressChanged += (s, e) => { Console.WriteLine("{0}%", e.ProgressPercentage); };
+        Launcher.ProgressChanged += (s, e) => { Console.WriteLine("{0}%", e.ProgressPercentage); };
 
         #endregion
     }
     public bool IsFlyoutOpen { get; set; }
-    public static L_Minecraft Instance => lazyInstance.Value;
+    public static LMinecraft Instance => LazyInstance.Value;
     
     public ObservableCollection<MVersion> Versions { get; }
     public ObservableCollection<MVersion> LocalVersions { get; private set; }
@@ -86,7 +86,7 @@ public class L_Minecraft : INotifyPropertyChanged
     private void GetVersions()
     {
         // Add error handling as needed
-        foreach (var version in launcher.GetAllVersions())
+        foreach (var version in Launcher.GetAllVersions())
         {
             var mvers = new MVersion
             {
@@ -100,7 +100,7 @@ public class L_Minecraft : INotifyPropertyChanged
 
     public async void DownloadVersion(MVersion version)
     {
-        var process = await launcher.CreateProcessAsync(version.Name, new MLaunchOption
+        var process = await Launcher.CreateProcessAsync(version.Name, new MLaunchOption
         {
             Session = MSession.CreateOfflineSession("username")
         });
@@ -112,7 +112,7 @@ public class L_Minecraft : INotifyPropertyChanged
         if (MinecraftSettings.Instance.SettingsPath + "LocalVersions.json" != null)
             await Application.Current.Dispatcher.InvokeAsync(() => { LoadLocalVersions(); });
         //LocalVersions.Clear();
-        foreach (var version in await launcher.GetAllVersionsAsync())
+        foreach (var version in await Launcher.GetAllVersionsAsync())
         {
             if (LocalVersions.FirstOrDefault(x => x.Name == version.Name) != null) return;
             await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -175,10 +175,11 @@ public class L_Minecraft : INotifyPropertyChanged
     // Example method in your L_Minecraft class to start a game
     public async void StartGame(MVersion version)
     {
-        var process = await launcher.CreateProcessAsync(version.Name, new MLaunchOption
+        var process = await Launcher.CreateProcessAsync(version.Name, new MLaunchOption
         {
             MaximumRamMb = MinecraftSettings.Instance.JavaMemory,
-            Session = MSession.CreateOfflineSession("username")
+            Session = AccountsManager.Instance.CurrentSession
+            
         });
 
         process.EnableRaisingEvents = true;

@@ -11,22 +11,22 @@ public partial class Dashboard : Page
     public Dashboard()
     {
         InitializeComponent();
-        DataContext = L_Minecraft.Instance;
+        DataContext = LMinecraft.Instance;
         TheFly = new AddVersionDialog();
     }
 
     private void Dashboard_OnLoaded(object sender, RoutedEventArgs e)
     {
-        L_Minecraft.Instance.GetVersionsLocal();
+        LMinecraft.Instance.GetVersionsLocal();
     }
 
     private void AddVersion_Click(object sender, RoutedEventArgs e)
     {
-        L_Minecraft.Instance.IsFlyoutOpen = true;
+        LMinecraft.Instance.IsFlyoutOpen = true;
     }
 
     private void TheFly_OnClosed(Flyout sender, RoutedEventArgs args)
     {
-        L_Minecraft.Instance.IsFlyoutOpen = false;
+        LMinecraft.Instance.IsFlyoutOpen = false;
     }
 }

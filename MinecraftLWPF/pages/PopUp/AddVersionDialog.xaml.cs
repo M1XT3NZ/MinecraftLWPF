@@ -10,23 +10,23 @@ public partial class AddVersionDialog : Flyout
     public AddVersionDialog()
     {
         InitializeComponent();
-        DataContext = L_Minecraft.Instance; // Assuming L_Minecraft provides the MinecraftModel
+        DataContext = LMinecraft.Instance; // Assuming L_Minecraft provides the MinecraftModel
     }
 
     private void Checkboxes_OnClick(object sender, RoutedEventArgs e)
     {
-        L_Minecraft.Instance.FilterVersions();
+        LMinecraft.Instance.FilterVersions();
     }
 
     private void Dashboard_OnLoaded(object sender, RoutedEventArgs e)
     {
-        L_Minecraft.Instance.FilterVersions();
+        LMinecraft.Instance.FilterVersions();
     }
 
     private void SexButton(object sender, RoutedEventArgs e)
     {
         var button = (Button)sender;
         var version = Test.SelectedItem as MVersion;
-        L_Minecraft.Instance.DownloadVersion(version);
+        LMinecraft.Instance.DownloadVersion(version);
     }
 }

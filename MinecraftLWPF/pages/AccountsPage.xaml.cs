@@ -9,12 +9,12 @@ namespace MinecraftLWPF.pages;
 
 public partial class AccountsPage : Page
 {
-    private readonly AccountsManager accountsManager;
+    private readonly AccountsManager _accountsManager;
 
     public AccountsPage()
     {
         InitializeComponent();
-        accountsManager = AccountsManager.Instance;
+        _accountsManager = AccountsManager.Instance;
         // Additional initialization if needed
     }
 
@@ -22,7 +22,7 @@ public partial class AccountsPage : Page
     {
         try
         {
-            await accountsManager.Login();
+            await _accountsManager.Login();
             // After successful login, fetch and display character head
            // await accountsManager.RefreshHead();
         }
@@ -35,7 +35,7 @@ public partial class AccountsPage : Page
     {
         try
         {
-            await accountsManager.Logout();
+            await _accountsManager.Logout();
             // After successful login, fetch and display character head
             //await accountsManager.RefreshHead();
         }

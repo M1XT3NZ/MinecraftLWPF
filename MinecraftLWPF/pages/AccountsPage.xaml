@@ -13,14 +13,14 @@
                 VerticalAlignment="Top" Click="Logout_Click" />
         
         <!-- Multi account support is not yet implemented but this is the beginning -->
-        <ComboBox ItemsSource="{Binding Accounts}">
+        <ComboBox ItemsSource="{Binding Accounts}" SelectedItem="0">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Profile.Username}" ></TextBlock>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <mcHeads:MouseWatchingHead x:Name="CharacterHead" Playername="{Binding  currentSession.Username,TargetNullValue=Gronkh }" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="100" />
+        <mcHeads:MouseWatchingHead x:Name="CharacterHead" Playername="{Binding  CurrentSession.Username,TargetNullValue=Gronkh }" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="100" />
         <Image x:Name="CharacterHeadImage" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="100" />
     </StackPanel>
 </Page>

@@ -15,12 +15,10 @@ namespace MinecraftLWPF.Minecraft
     public class AccountsManager : INotifyPropertyChanged
     {
         private static AccountsManager? _instance;
-        public MSession currentSession { get; private set; } = null;
-        private JELoginHandler loginhandler;
-        private readonly HttpClient httpClient = new();
+        public MSession? CurrentSession { get; private set; } = null;
+        private JELoginHandler _loginhandler;
+        private readonly HttpClient _httpClient = new();
         public ObservableCollection<JEGameAccount> Accounts { get; private set; }
-
-        // Private constructor to prevent instantiation from outside the class
         public AccountsManager()
         {
             _instance = this;
@@ -50,8 +48,8 @@ namespace MinecraftLWPF.Minecraft
         {
             try
             {
-                loginhandler = new JELoginHandlerBuilder()
-                    .WithHttpClient(httpClient)
+                _loginhandler = new JELoginHandlerBuilder()
+                    .WithHttpClient(_httpClient)
                     .WithAccountManager(MinecraftSettings.Instance.SettingsPath + "accounts.json")
                     .Build();
 
@@ -59,11 +57,11 @@ namespace MinecraftLWPF.Minecraft
                 //the user is not logged in or hasn't logged in before
                 if (silently)
                 {
-                    currentSession = await loginhandler.AuthenticateSilently();
+                    CurrentSession = await _loginhandler.AuthenticateSilently();
                 }
                 else
                 {
-                    currentSession = await loginhandler.Authenticate();
+                    CurrentSession = await _loginhandler.Authenticate();
                 }
                 await UpdateAccountList();
             }
@@ -72,17 +70,16 @@ namespace MinecraftLWPF.Minecraft
                 Console.WriteLine(e);
             }
         }
-
         public async Task Logout()
         {
-            Console.WriteLine(currentSession.Xuid);
-            await loginhandler.Signout(loginhandler.AccountManager.GetAccounts().GetAccount(currentSession.Xuid));
-            currentSession = null;
+            Console.WriteLine(CurrentSession.Xuid);
+            await _loginhandler.Signout(_loginhandler.AccountManager.GetAccounts().GetAccount(CurrentSession.Xuid));
+            CurrentSession = null;
             await UpdateAccountList();
         }
         private Task UpdateAccountList()
         {
-            var accounts = loginhandler.AccountManager.GetAccounts();
+            var accounts = _loginhandler.AccountManager.GetAccounts();
             foreach (var account in accounts)
             {
                 if (account is not JEGameAccount jeAccount)
