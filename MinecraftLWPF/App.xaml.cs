@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using MinecraftLWPF.Minecraft;
 
 namespace MinecraftLWPF;
 
@@ -7,4 +8,9 @@ namespace MinecraftLWPF;
 /// </summary>
 public partial class App : Application
 {
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+        AccountsManager.Login(true);
+    }
 }

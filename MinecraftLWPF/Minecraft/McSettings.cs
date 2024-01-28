@@ -27,8 +27,13 @@ public class MinecraftSettings
 
     [JsonIgnore] public List<int> JavaMemoryOptions { get; private set; }
 
-    public string JavaCustomArguments { get; set; } = "";
-
+    public string[]? JavaCustomArguments { get; set; } = null;
+    [JsonIgnore]
+    public string JavaCustomArgumentsString
+    {
+        get => JavaCustomArguments == null ? string.Empty : string.Join(" ", JavaCustomArguments);
+        set => JavaCustomArguments = string.IsNullOrEmpty(value) ? null : value.Split(' ');
+    }
     [JsonIgnore] public long MaxMemory => GetTotalPhysicalMemory() / 1024 / 1024; // MB
 
     public string Language { get; set; } = "en";

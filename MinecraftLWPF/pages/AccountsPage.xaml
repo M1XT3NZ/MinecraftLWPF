@@ -2,10 +2,16 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mcHeads="clr-namespace:leMaik.McHeads;assembly=leMaik.McHeads"
+      xmlns:model="clr-namespace:MinecraftLWPF.Minecraft"
       Title="AccountsPage" Height="450" Width="800">
-    <Page.DataContext>
-        <Binding Source="{StaticResource AccountsManager}" />
-    </Page.DataContext>
+    <!-- <Page.Resources> -->
+    <!--     <ResourceDictionary> -->
+    <!--         <model:AccountsManager x:Key="AccountsManager"></model:AccountsManager> -->
+    <!--     </ResourceDictionary> -->
+    <!-- </Page.Resources> -->
+    <!-- <Page.DataContext> -->
+    <!--     <Binding Source="{ model:AccountsManager}" /> -->
+    <!-- </Page.DataContext> -->
     <StackPanel>
         <Button x:Name="SwitchAccountButton" Content="Log In Account" HorizontalAlignment="Left"
                 VerticalAlignment="Top" Click="Login_Click" />
@@ -13,14 +19,20 @@
                 VerticalAlignment="Top" Click="Logout_Click" />
         
         <!-- Multi account support is not yet implemented but this is the beginning -->
-        <ComboBox ItemsSource="{Binding Accounts}" SelectedItem="0">
+        <ComboBox ItemsSource="{Binding Source={x:Static model:AccountsManager.Accounts}}"
+                  SelectedValue="{Binding Source={x:Static model:AccountsManager.SelectedAccount},Path=Identifier,TargetNullValue='mrfunky21',Mode=TwoWay }"
+                  
+                  SelectedItem="0"
+                  SelectionChanged="AccountSelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Profile.Username}" ></TextBlock>
+                    <TextBlock Text="{Binding Profile.Username}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <mcHeads:MouseWatchingHead x:Name="CharacterHead" Playername="{Binding  CurrentSession.Username,TargetNullValue=Gronkh }" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="100" />
-        <Image x:Name="CharacterHeadImage" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="100" />
+        <mcHeads:MouseWatchingHead DataContext="{StaticResource AccountsManagerCommands}" x:Name="CharacterHead" Playername="{Binding  
+         SelectedAccountUsername,TargetNullValue='mrfunky21' }" HorizontalAlignment="Right" 
+                                   VerticalAlignment="Top" Width="100" Height="100" />
+        
     </StackPanel>
 </Page>

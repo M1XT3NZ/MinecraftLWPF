@@ -178,7 +178,8 @@ public class LMinecraft : INotifyPropertyChanged
         var process = await Launcher.CreateProcessAsync(version.Name, new MLaunchOption
         {
             MaximumRamMb = MinecraftSettings.Instance.JavaMemory,
-            Session = AccountsManager.Instance.CurrentSession
+            Session = AccountsManager.CurrentSession,
+            JVMArguments = MinecraftSettings.Instance.JavaCustomArguments
             
         });
 
@@ -204,13 +205,6 @@ public class LMinecraft : INotifyPropertyChanged
             OnPropertyChanged(nameof(LocalVersions)); // Notify UI to update
         }
         // Logic to save playtime, for example, to a file or settings
-    }
-
-    private void PlayVersion(object parameter)
-    {
-        var version = parameter as string;
-        MessageBox.Show("Play version: " + version, "Play version");
-        // Implement the logic to launch this version
     }
 
     #endregion

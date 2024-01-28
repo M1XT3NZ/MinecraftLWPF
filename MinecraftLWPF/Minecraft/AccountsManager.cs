@@ -1,51 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CmlLib.Core.Auth;
 using CmlLib.Core.Auth.Microsoft;
 using CmlLib.Core.Auth.Microsoft.Sessions;
+using XboxAuthNet.Game.SessionStorages;
 using XboxAuthNet.OAuth;
 
 namespace MinecraftLWPF.Minecraft
 {
-    public class AccountsManager : INotifyPropertyChanged
+    public static class AccountsManager
     {
-        private static AccountsManager? _instance;
-        public MSession? CurrentSession { get; private set; } = null;
-        private JELoginHandler _loginhandler;
-        private readonly HttpClient _httpClient = new();
-        public ObservableCollection<JEGameAccount> Accounts { get; private set; }
-        public AccountsManager()
-        {
-            _instance = this;
-            Accounts = new ObservableCollection<JEGameAccount>();
-            Login(true);
+        public static MSession? CurrentSession { get; set; } = new MSession();
 
-        }
+        private static JEGameAccount? _selectedAccount;
 
-        // Public method to get the singleton instance
-        public static AccountsManager Instance
+        public static JEGameAccount? SelectedAccount
         {
-            get
+            get => _selectedAccount;
+            set
             {
-                if (_instance == null)
-                {
-                    _instance = new AccountsManager();
-                }
-                return _instance;
-            }
-            private set
-            {
-                _instance = value;
+                _selectedAccount = value;
+                OnSelectedAccountChanged?.Invoke();
+                RefreshHead();
             }
         }
+        public static Action? OnSelectedAccountChanged;
+        private static JELoginHandler? _loginhandler;
+        private static readonly HttpClient _httpClient = new();
+        public static ObservableCollection<JEGameAccount>? Accounts { get; private set; } = new ObservableCollection<JEGameAccount>();
 
-        public async Task Login(bool silently = false)
+        public static async Task Login(bool silently = false)
         {
+            OnSelectedAccountChanged += async () => await RefreshHead();
             try
             {
                 _loginhandler = new JELoginHandlerBuilder()
@@ -56,13 +45,9 @@ namespace MinecraftLWPF.Minecraft
                 //This means logging in with the Previous account if it was logged in before so we only need to fire the authentication event when 
                 //the user is not logged in or hasn't logged in before
                 if (silently)
-                {
                     CurrentSession = await _loginhandler.AuthenticateSilently();
-                }
                 else
-                {
                     CurrentSession = await _loginhandler.Authenticate();
-                }
                 await UpdateAccountList();
             }
             catch (MicrosoftOAuthException e)
@@ -70,14 +55,16 @@ namespace MinecraftLWPF.Minecraft
                 Console.WriteLine(e);
             }
         }
-        public async Task Logout()
+
+        public static async Task Logout()
         {
             Console.WriteLine(CurrentSession.Xuid);
             await _loginhandler.Signout(_loginhandler.AccountManager.GetAccounts().GetAccount(CurrentSession.Xuid));
             CurrentSession = null;
             await UpdateAccountList();
         }
-        private Task UpdateAccountList()
+
+        private static Task UpdateAccountList()
         {
             var accounts = _loginhandler.AccountManager.GetAccounts();
             foreach (var account in accounts)
@@ -91,21 +78,18 @@ namespace MinecraftLWPF.Minecraft
                 Console.WriteLine("UUID: " + jeAccount.Profile?.UUID);
                 Accounts.Add(jeAccount);
             }
+
             return Task.CompletedTask;
         }
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        
+        public static async Task RefreshHead()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
+            if (CurrentSession == null)
+                return;
+            AccountsManagerCommands.Instance.SelectedAccountUsername = CurrentSession.Username;
+            
         }
     }
+    
+
 }
